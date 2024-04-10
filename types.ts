@@ -1,8 +1,9 @@
 
 export type WindowProps = {
+  text?:string
   content?:{
       [key:string]:WindowProps 
-  }| string
+  }
   widthPersent?:number
   heightPersent?:number
 }

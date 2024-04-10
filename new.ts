@@ -1,9 +1,14 @@
-import { tableChars } from "./chars"
 import type { WindowProps } from "./types"
+import {chars} from "./chars"
 
 const width = process.stdout.columns
 const height = process.stdout.rows - 4
 
+
+
+const {
+  TopLeft,TopRight,BottomLeft,BottomRight,Horizontal,Vertical,MiddleLeft,MiddleRight,MiddleTop,MiddleBottom,MiddleCross
+} = chars
 
 
 
@@ -11,36 +16,55 @@ const height = process.stdout.rows - 4
 
 
 function wrapper(){
-}
 
-function fillArea(props:DivProps):string{
-  return `${tableChars.tableTopLeft}${tableChars..repeat(props.width-2)}┐\n`
 }
 
 
-function Window ({
-  content
-}:WindowProps) :string {
-  if(typeof content === "string"){
-    return div({
-      content,
-      width: width,
-      height: height
-    })
-  }else{
-    return "this is an object"
-  }
-}
-
-
-type DivProps = {
+type FillProps = {
   content: string
   width: number
   height: number
 }
 
-function div ({content,width,height}) :string{
-  const filledArea = fillArea(content,width,height);
+function fillArea(props:FillProps):string{
+  let result =  `${TopLeft}${Horizontal.repeat(props.width-2)}${TopRight}\n`
+  result += `${Vertical}${props.content.padEnd(props.width-2)}${Vertical}\n`
+  for (let i = 0; i < (props.height-1); i++) {
+    result += `${Vertical}${' '.repeat(props.width-2)}${Vertical}\n`
+  }
+  result += `${BottomLeft}${Horizontal.repeat(props.width-2)}${BottomRight}`
+  return result
+}
+
+
+function Window ({
+  text,
+  content
+}:WindowProps) :string {
+  if(text){
+    return div({content:[text],width:[width],height:[height]})
+  }else if(content){
+    const elements = Object.entries(content);
+    let result = "";
+    elements.forEach(([key,value])=>{
+      result += Window(value)
+    })
+  }else{
+    return "no content provided"
+  }
+
+}
+
+
+type DivProps = {
+  content: string[]
+  width: number[]
+  height: number[]
+}
+
+function div ({content,width,height}:DivProps) :string{
+
+  const filledArea = fillArea({content,width,height});
   return filledArea;
 }
 
@@ -60,7 +84,7 @@ console.log(
   Window(
     {
       content:{
-          chat
+        chat
       }
     }
   )
